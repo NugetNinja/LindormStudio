@@ -1,0 +1,72 @@
+﻿<Window x:Class="LindormStudio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LindormStudio"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+        Title="Lindorm Studio" Height="450" Width="800">
+    <DockPanel Margin="4">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="数据源：" VerticalAlignment="Center"/>
+            <ComboBox Width="150" ItemsSource="{Binding Connections}" SelectedItem="{Binding SelectedConnection}" DisplayMemberPath="Name" />
+            <TextBlock Margin="8 0 0 0" Text="数据库：" VerticalAlignment="Center"/>
+            <ComboBox Width="200" ItemsSource="{Binding Databases}" SelectedItem="{Binding SelectedDatabase}" />
+            <Button Margin="8 0 0 0" Command="{Binding ExecuteSqlCommand}">Execute</Button>
+            <Button Margin="8 0 0 0" Command="{Binding NewQueryCommand}">New Query</Button>
+        </StackPanel>
+        <Grid Margin="0 8 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TabControl ItemsSource="{Binding Documents}" SelectedValue="{Binding SelectedDocument}" SelectedValuePath="Value">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Margin="8 0 0 0" Command="{Binding DataContext.RemoveQueryCommand,RelativeSource={RelativeSource AncestorType=local:MainWindow}}" CommandParameter="{Binding Key}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <TextBlock Text="X"/>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="Red" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <TextBlock Text="{Binding Key}"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <avalonEdit:TextEditor
+                            xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                            FontFamily="Consolas"
+                            SyntaxHighlighting="TSQL"
+                            FontSize="10pt"
+                            ShowLineNumbers="True"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Auto"
+                            Document="{Binding Value,Mode=OneWay}">
+                        </avalonEdit:TextEditor>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Background="Gray"/>
+            <TabControl Grid.Row="2" SelectedIndex="{Binding ResultTabIndex}">
+                <TabItem Header="结果">
+                    <DataGrid ItemsSource="{Binding Results}" IsReadOnly="True"></DataGrid>
+                </TabItem>
+                <TabItem Header="消息">
+                    <TextBox IsReadOnly="True" Text="{Binding Messages}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"></TextBox>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+
+</Window>
